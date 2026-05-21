@@ -11,6 +11,12 @@ if(isset($_POST['theme'])){
     $fichier = $_FILES['fichier']['name'];
     $tmp = $_FILES['fichier']['tmp_name'];
 
+    $extension = strtolower(pathinfo($fichier, PATHINFO_EXTENSION));
+    $extensions_ok = ['pdf', 'doc', 'docx'];
+
+    if (!in_array($extension, $extensions_ok)) {
+    die("Erreur : seulement les fichiers PDF et Word sont acceptés.");
+    }
     move_uploaded_file(
         $tmp,
         "../uploads/".$fichier

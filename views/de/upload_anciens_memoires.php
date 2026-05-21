@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../../assets/css/upload.css">
+<link rel="stylesheet" href="../../assets/css/style.css">
 <script src="../../assets/js/upload.js"></script>
 <h2>Ajouter anciens mémoires</h2>
 
@@ -14,7 +14,7 @@
    <input type="text" name="auteur" id="auteur">
 
     <label>Fichier:</label> 
-   <input type="file" name="fichier" id="fichier">
+   <input type="file" name="fichier" id="fichier" accept=".pdf,.doc,.docx">
 
     <label>Filière:</label> 
     <input type="text" name="filiere">
