@@ -1,150 +1,132 @@
 <?php
 /**
- * Vue Modifier un compte — app/views/admin/modifier_compte.php
- * Couche : PRÉSENTATION
+ * Vue Modifier un compte — views/admin/modifier_compte.php
+ * Auteur : Gaïus_Ahs (Vital-Ahs)
  */
-$pageTitle = 'Modifier un compte';
-require_once VIEW_PATH . '/layout/header.php';
+require_once __DIR__ . '/../../config/connexion.php';
+require_once __DIR__ . '/../../config/auth_config.php';
+require_once __DIR__ . '/../../models/Utilisateur.php';
+require_once __DIR__ . '/../../models/Filiere.php';
+require_once __DIR__ . '/../../services/CompteService.php';
 
-$parUFR = [];
-foreach ($filieres as $f) {
-    $key = ($f['code_ufr'] ?? '') . ' — ' . ($f['nom_ufr'] ?? 'UFR');
-    $parUFR[$key][] = $f;
+if (!isset($_SESSION['user_id'])||$_SESSION['user_role']!==ROLE_ADMINISTRATEUR) {
+    header('Location: '.BASE_URL.'/views/auth/login.php'); exit;
 }
-ksort($parUFR);
 
-$rolesDisponibles = [
-    ROLE_ETUDIANT         => 'Étudiant',
-    ROLE_PROFESSEUR       => 'Professeur / Encadreur',
-    ROLE_DIRECTEUR_ETUDES => 'Directeur des études',
-    ROLE_ADMINISTRATEUR   => 'Administrateur',
-];
+$id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
+$utilisateur = Utilisateur::findById($id);
+if (!$utilisateur) {
+    $_SESSION['flash']=['succes'=>false,'message'=>'Utilisateur introuvable.'];
+    header('Location: '.BASE_URL.'/views/admin/utilisateurs.php'); exit;
+}
+
+$svc     = new CompteService();
+$erreurs = []; $erreur = ''; $succes = '';
+$filieres = Filiere::findAll();
+$parUFR  = [];
+foreach ($filieres as $f) $parUFR[$f->nom_ufr ?? 'UFR'][] = $f;
+
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+    $r = $svc->modifierCompte($id, $_POST);
+    if ($r['succes']) {
+        $_SESSION['flash']=$r;
+        header('Location: '.BASE_URL.'/views/admin/utilisateurs.php'); exit;
+    }
+    $erreurs=$r['erreurs']; $erreur=$r['message'];
+    $utilisateur = Utilisateur::findById($id);
+}
+
+$roles=[ROLE_ETUDIANT=>'Étudiant',ROLE_PROFESSEUR=>'Professeur',
+        ROLE_DIRECTEUR_ETUDES=>'Dir. des études',ROLE_ADMINISTRATEUR=>'Administrateur'];
 ?>
-
-<div class="page-header">
-  <h1>✏️ Modifier le compte</h1>
-  <a href="<?= BASE_URL ?>/compte/index" class="btn btn-secondary">← Retour à la liste</a>
-</div>
-
-<!-- Résumé du compte -->
-<div class="compte-resume">
-  <div class="compte-avatar">
-    <?= mb_strtoupper(mb_substr($utilisateur->prenom,0,1).mb_substr($utilisateur->nom,0,1)) ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Modifier le compte — UATM</title>
+  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/auth.css">
+</head>
+<body>
+<nav class="navbar">
+  <a class="navbar-brand" href="#">📚 GéMémoires — Admin</a>
+  <div class="navbar-links">
+    <a href="<?= BASE_URL ?>/views/admin/utilisateurs.php">← Retour</a>
+    <a href="<?= BASE_URL ?>/controllers/AuthController.php?action=logout" class="btn-logout">Déconnexion</a>
   </div>
-  <div>
-    <strong><?= htmlspecialchars($utilisateur->getNomComplet()) ?></strong>
-    <span class="text-muted">ID #<?= $utilisateur->id_user ?></span>
-    <span class="badge <?= $utilisateur->actif ? 'badge-green' : 'badge-red' ?>">
-      <?= $utilisateur->actif ? 'Actif' : 'Inactif' ?>
-    </span>
+</nav>
+<div class="main-container">
+  <div class="page-header">
+    <h1>✏️ Modifier le compte de <?= htmlspecialchars($utilisateur->getNomComplet()) ?></h1>
   </div>
-</div>
+  <?php if($erreur): ?><div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div><?php endif; ?>
 
-<?php if (!empty($erreur)): ?>
-  <div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div>
-<?php endif; ?>
-
-<div class="form-container">
-  <form method="POST" action="<?= BASE_URL ?>/compte/modifier/<?= $utilisateur->id_user ?>" novalidate>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="nom">Nom <span class="req">*</span></label>
-        <input type="text" id="nom" name="nom" required
-               value="<?= htmlspecialchars($_POST['nom'] ?? $utilisateur->nom) ?>">
-        <?php if (!empty($erreurs['nom'])): ?>
-          <span class="form-err"><?= htmlspecialchars($erreurs['nom']) ?></span>
-        <?php endif; ?>
-      </div>
-      <div class="form-group">
-        <label for="prenom">Prénom <span class="req">*</span></label>
-        <input type="text" id="prenom" name="prenom" required
-               value="<?= htmlspecialchars($_POST['prenom'] ?? $utilisateur->prenom) ?>">
-        <?php if (!empty($erreurs['prenom'])): ?>
-          <span class="form-err"><?= htmlspecialchars($erreurs['prenom']) ?></span>
-        <?php endif; ?>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email <span class="req">*</span></label>
-      <input type="email" id="email" name="email" required
-             value="<?= htmlspecialchars($_POST['email'] ?? $utilisateur->email) ?>">
-      <?php if (!empty($erreurs['email'])): ?>
-        <span class="form-err"><?= htmlspecialchars($erreurs['email']) ?></span>
-      <?php endif; ?>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="role">Rôle</label>
-        <select id="role" name="role" onchange="toggleFiliere(this.value)">
-          <?php foreach ($rolesDisponibles as $val => $lbl): ?>
-            <option value="<?= $val ?>"
-              <?= (($_POST['role'] ?? $utilisateur->role) === $val) ? 'selected' : '' ?>>
-              <?= $lbl ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-
-      <div class="form-group" id="groupeFiliere">
-        <label for="id_filiere">Filière (si étudiant)</label>
-        <select id="id_filiere" name="id_filiere">
-          <option value="">-- Aucune --</option>
-          <?php foreach ($parUFR as $groupe => $liste): ?>
-            <optgroup label="<?= htmlspecialchars($groupe) ?>">
-              <?php foreach ($liste as $f): ?>
-                <option value="<?= $f['id_filiere'] ?>"
-                  <?= (($utilisateur->id_filiere == $f['id_filiere'])) ? 'selected' : '' ?>>
-                  <?= htmlspecialchars($f['nom_filiere']) ?> (<?= $f['niveau'] ?>)
-                </option>
-              <?php endforeach; ?>
-            </optgroup>
-          <?php endforeach; ?>
-        </select>
-      </div>
-    </div>
-
-    <!-- Réinitialiser le mot de passe (optionnel) -->
-    <details class="section-details">
-      <summary>🔑 Réinitialiser le mot de passe (optionnel)</summary>
-      <div class="form-row" style="margin-top:14px">
+  <div class="form-container">
+    <form method="POST" action="" novalidate>
+      <input type="hidden" name="id" value="<?= $id ?>">
+      <div class="form-row">
         <div class="form-group">
-          <label for="nouveau_mdp">
-            Nouveau MDP
-            <span class="toggle-mdp" onclick="toggleVisibilite('nouveau_mdp', this)">👁</span>
-          </label>
-          <input type="password" id="nouveau_mdp" name="nouveau_mdp"
-                 placeholder="Laisser vide = pas de changement">
-          <span class="form-hint">Min. 8 caractères si renseigné.</span>
+          <label>Nom <span class="req">*</span></label>
+          <input type="text" name="nom" value="<?= htmlspecialchars($_POST['nom']??$utilisateur->nom) ?>" required>
+          <?php if(!empty($erreurs['nom'])): ?><span class="form-err"><?= htmlspecialchars($erreurs['nom']) ?></span><?php endif; ?>
         </div>
         <div class="form-group">
-          <label for="confirmer_mdp_reset">Confirmer</label>
-          <input type="password" id="confirmer_mdp_reset" name="confirmer_mdp"
-                 placeholder="Répéter">
+          <label>Prénom <span class="req">*</span></label>
+          <input type="text" name="prenom" value="<?= htmlspecialchars($_POST['prenom']??$utilisateur->prenom) ?>" required>
         </div>
       </div>
-    </details>
-
-    <div class="form-actions">
-      <a href="<?= BASE_URL ?>/compte/index" class="btn btn-secondary">Annuler</a>
-      <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
-    </div>
-  </form>
+      <div class="form-group">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" name="email" value="<?= htmlspecialchars($_POST['email']??$utilisateur->email) ?>" required>
+        <?php if(!empty($erreurs['email'])): ?><span class="form-err"><?= htmlspecialchars($erreurs['email']) ?></span><?php endif; ?>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rôle</label>
+          <select name="role">
+            <?php foreach($roles as $val=>$lbl): ?>
+              <option value="<?= $val ?>" <?= (($_POST['role']??$utilisateur->role)===$val)?'selected':'' ?>><?= $lbl ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filière</label>
+          <select name="id_filiere">
+            <option value="">-- Aucune --</option>
+            <?php foreach($parUFR as $ufr=>$liste): ?>
+              <optgroup label="<?= htmlspecialchars($ufr) ?>">
+                <?php foreach($liste as $f): ?>
+                  <option value="<?= $f->id_filiere ?>" <?= ($utilisateur->id_filiere==$f->id_filiere)?'selected':'' ?>>
+                    <?= htmlspecialchars($f->nom_filiere) ?> (<?= $f->niveau ?>)
+                  </option>
+                <?php endforeach; ?>
+              </optgroup>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <details class="section-details">
+        <summary>🔑 Réinitialiser le mot de passe (optionnel)</summary>
+        <div class="form-row" style="margin-top:12px">
+          <div class="form-group">
+            <label>Nouveau MDP <span class="toggle-mdp" onclick="toggle('np',this)">👁</span></label>
+            <input type="password" id="np" name="nouveau_mdp" placeholder="Laisser vide = inchangé">
+          </div>
+          <div class="form-group">
+            <label>Confirmer</label>
+            <input type="password" name="confirmer_mdp" placeholder="Répéter">
+          </div>
+        </div>
+      </details>
+      <div class="form-actions">
+        <a href="<?= BASE_URL ?>/views/admin/utilisateurs.php" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+      </div>
+    </form>
+  </div>
 </div>
-
 <script>
-function toggleFiliere(role) {
-  const g = document.getElementById('groupeFiliere');
-  g.style.opacity = role === '<?= ROLE_ETUDIANT ?>' ? '1' : '.5';
-}
-function toggleVisibilite(id, btn) {
-  const i = document.getElementById(id);
-  i.type = i.type === 'password' ? 'text' : 'password';
-  btn.textContent = i.type === 'password' ? '👁' : '🙈';
-}
-toggleFiliere(document.getElementById('role').value);
+function toggle(id,btn){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁':'🙈';}
 </script>
-
-<?php require_once VIEW_PATH . '/layout/footer.php'; ?>
+</body>
+</html>
