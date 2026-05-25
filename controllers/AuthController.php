@@ -2,7 +2,6 @@
 /**
  * Contrôleur AuthController — Gestion Mémoires UATM GASA FORMATION
  * Couche : CONTRÔLEUR — Aucun SQL, aucune logique métier.
- * Reçoit HTTP → appelle Service → redirige vers Vue.
  * Auteur : Gaïus_Ahs (Vital-Ahs)
  */
 require_once __DIR__ . '/../config/connexion.php';
@@ -19,15 +18,11 @@ class AuthController
         $this->svc = new AuthService();
     }
 
-    /* ── LOGIN ──────────────────────────────────────────── */
     public function login(): void {
         if (isset($_SESSION['user_id'])) { $this->redirectParRole(); return; }
-        $erreur = ''; $succes = '';
-
-        if (isset($_SESSION['flash_ok'])) {
-            $succes = $_SESSION['flash_ok'];
-            unset($_SESSION['flash_ok']);
-        }
+        $erreur = '';
+        $succes = $_SESSION['flash_ok'] ?? '';
+        unset($_SESSION['flash_ok']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $r = $this->svc->connecter(
@@ -40,7 +35,6 @@ class AuthController
         require_once __DIR__ . '/../views/auth/login.php';
     }
 
-    /* ── REGISTER ───────────────────────────────────────── */
     public function register(): void {
         if (isset($_SESSION['user_id'])) { $this->redirectParRole(); return; }
         $erreurs = []; $erreur = ''; $succes = '';
@@ -57,15 +51,13 @@ class AuthController
         require_once __DIR__ . '/../views/auth/register.php';
     }
 
-    /* ── LOGOUT ─────────────────────────────────────────── */
     public function logout(): void {
         $this->svc->deconnecter();
         header('Location: ' . BASE_URL . '/views/auth/login.php'); exit;
     }
 
-    /* ── PROFIL ─────────────────────────────────────────── */
     public function profil(): void {
-        $this->requiertConnexion();
+        $this->auth();
         $erreurs = []; $erreur = ''; $succes = '';
         $utilisateur = Utilisateur::findById((int)$_SESSION['user_id']);
         $filieres    = Filiere::findAll();
@@ -73,7 +65,7 @@ class AuthController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $r = $this->svc->modifierProfil((int)$_SESSION['user_id'], $_POST);
             if ($r['succes']) {
-                $succes      = $r['message'];
+                $succes = $r['message'];
                 $utilisateur = Utilisateur::findById((int)$_SESSION['user_id']);
             } else {
                 $erreurs = $r['erreurs']; $erreur = $r['message'];
@@ -82,9 +74,8 @@ class AuthController
         require_once __DIR__ . '/../views/auth/profil.php';
     }
 
-    /* ── CHANGER MDP ────────────────────────────────────── */
     public function changerMdp(): void {
-        $this->requiertConnexion();
+        $this->auth();
         $erreurs = []; $erreur = ''; $succes = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -95,8 +86,7 @@ class AuthController
         require_once __DIR__ . '/../views/auth/changer_mdp.php';
     }
 
-    /* ── PRIVÉS ─────────────────────────────────────────── */
-    private function requiertConnexion(): void {
+    private function auth(): void {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . BASE_URL . '/views/auth/login.php'); exit;
         }
@@ -104,16 +94,16 @@ class AuthController
 
     private function redirectParRole(): void {
         $dest = match ($_SESSION['user_role'] ?? '') {
-            ROLE_PROFESSEUR       => BASE_URL . '/views/professeur/validation_memoire.php',
-            ROLE_DIRECTEUR_ETUDES => BASE_URL . '/views/de/upload_anciens_memoires.php',
-            ROLE_ADMINISTRATEUR   => BASE_URL . '/views/admin/utilisateurs.php',
-            default               => BASE_URL . '/views/auth/login.php',
+            ROLE_PROFESSEUR      => BASE_URL . '/views/professeur/validation_memoire.php',
+            ROLE_DIRECTEUR_ETUDE => BASE_URL . '/views/de/upload_anciens_memoires.php',
+            ROLE_ADMINISTRATEUR  => BASE_URL . '/views/admin/utilisateurs.php',
+            default              => BASE_URL . '/views/auth/profil.php',
         };
         header('Location: ' . $dest); exit;
     }
 }
 
-/* ── EXÉCUTION DIRECTE (accès via formulaire HTML) ────────── */
+// Exécution directe via URL
 if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
     $ctrl   = new AuthController();
     $action = $_GET['action'] ?? $_POST['action'] ?? 'login';

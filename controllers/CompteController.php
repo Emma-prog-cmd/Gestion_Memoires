@@ -17,7 +17,7 @@ class CompteController
     public function __construct() {
         $this->svc = new CompteService();
         if (!isset($_SESSION['user_id']) ||
-            $_SESSION['user_role'] !== ROLE_ADMINISTRATEUR) {
+            $_SESSION['user_role'] !== 'administrateur') {
             header('Location: ' . BASE_URL . '/views/auth/login.php'); exit;
         }
     }

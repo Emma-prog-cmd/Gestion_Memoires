@@ -19,7 +19,7 @@ if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['user_role'];
     if ($role === ROLE_PROFESSEUR)
         header('Location: ' . BASE_URL . '/views/professeur/validation_memoire.php');
-    elseif ($role === ROLE_DIRECTEUR_ETUDES)
+    elseif ($role === ROLE_DIRECTEUR_ETUDE)
         header('Location: ' . BASE_URL . '/views/de/upload_anciens_memoires.php');
     elseif ($role === ROLE_ADMINISTRATEUR)
         header('Location: ' . BASE_URL . '/views/admin/utilisateurs.php');
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role = $_SESSION['user_role'];
         if ($role === ROLE_PROFESSEUR)
             header('Location: ' . BASE_URL . '/views/professeur/validation_memoire.php');
-        elseif ($role === ROLE_DIRECTEUR_ETUDES)
+        elseif ($role === ROLE_DIRECTEUR_ETUDE)
             header('Location: ' . BASE_URL . '/views/de/upload_anciens_memoires.php');
         elseif ($role === ROLE_ADMINISTRATEUR)
             header('Location: ' . BASE_URL . '/views/admin/utilisateurs.php');

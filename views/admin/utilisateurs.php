@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../config/auth_config.php';
 require_once __DIR__ . '/../../models/Utilisateur.php';
 require_once __DIR__ . '/../../services/CompteService.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== ROLE_ADMINISTRATEUR) {
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'administrateur') {
     header('Location: ' . BASE_URL . '/views/auth/login.php'); exit;
 }
 
@@ -24,10 +24,10 @@ $stats        = $data['stats'];
 $total        = $data['total'];
 
 $roleLabels = [
-    ROLE_ETUDIANT         => ['label'=>'Étudiant',        'badge'=>'badge-blue'],
+    ROLE_ETUDIANT_DIPLOME         => ['label'=>'Étudiant',        'badge'=>'badge-blue'],
     ROLE_PROFESSEUR       => ['label'=>'Professeur',       'badge'=>'badge-green'],
-    ROLE_DIRECTEUR_ETUDES => ['label'=>'Dir. études',      'badge'=>'badge-orange'],
-    ROLE_ADMINISTRATEUR   => ['label'=>'Administrateur',   'badge'=>'badge-red'],
+    ROLE_DIRECTEUR_ETUDE => ['label'=>'Dir. études',      'badge'=>'badge-orange'],
+    'administrateur'   => ['label'=>'Administrateur',   'badge'=>'badge-red'],
 ];
 ?>
 <!DOCTYPE html>

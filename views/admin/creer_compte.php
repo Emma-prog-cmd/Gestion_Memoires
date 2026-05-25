@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../models/Utilisateur.php';
 require_once __DIR__ . '/../../models/Filiere.php';
 require_once __DIR__ . '/../../services/CompteService.php';
 
-if (!isset($_SESSION['user_id'])||$_SESSION['user_role']!==ROLE_ADMINISTRATEUR) {
+if (!isset($_SESSION['user_id'])||$_SESSION['user_role']!=='administrateur') {
     header('Location: '.BASE_URL.'/views/auth/login.php'); exit;
 }
 $svc     = new CompteService();
@@ -28,10 +28,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 }
 
 $roles = [
-    ROLE_ETUDIANT         => 'Étudiant',
+    ROLE_ETUDIANT_DIPLOME         => 'Étudiant',
     ROLE_PROFESSEUR       => 'Professeur / Encadreur',
-    ROLE_DIRECTEUR_ETUDES => 'Directeur des études',
-    ROLE_ADMINISTRATEUR   => 'Administrateur',
+    ROLE_DIRECTEUR_ETUDE => 'Directeur des études',
+    'administrateur'   => 'Administrateur',
 ];
 ?>
 <!DOCTYPE html>
@@ -122,7 +122,7 @@ $roles = [
 </div>
 <script>
 function toggle(id,btn){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁':'🙈';}
-function toggleFiliere(role){document.getElementById('gFiliere').style.opacity=role==='<?= ROLE_ETUDIANT ?>'?'1':'0.4';}
+function toggleFiliere(role){document.getElementById('gFiliere').style.opacity=role==='<?= ROLE_ETUDIANT_DIPLOME ?>'?'1':'0.4';}
 toggleFiliere(document.querySelector('[name=role]')?.value||'');
 </script>
 </body>

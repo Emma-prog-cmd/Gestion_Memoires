@@ -11,7 +11,7 @@ require_once __DIR__ . '/../models/Utilisateur.php';
 class CompteService
 {
     private const ROLES = [
-        'etudiant','professeur','directeur_etudes','administrateur'
+        'etudiant_diplome','etudiant_consultant','professeur','directeur_etude','administrateur'
     ];
 
     /* ── LISTER TOUS ────────────────────────────────────── */

@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $utilisateur = Utilisateur::findById($id);
 }
 
-$roles=[ROLE_ETUDIANT=>'Étudiant',ROLE_PROFESSEUR=>'Professeur',
-        ROLE_DIRECTEUR_ETUDES=>'Dir. des études',ROLE_ADMINISTRATEUR=>'Administrateur'];
+$roles=[ROLE_ETUDIANT_DIPLOME=>'Étudiant diplômé',ROLE_ETUDIANT_CONSULTANT=>'Étudiant consultant',
+        ROLE_PROFESSEUR=>'Professeur',ROLE_DIRECTEUR_ETUDE=>'Directeur études',ROLE_ADMINISTRATEUR=>'Administrateur'];
 ?>
 <!DOCTYPE html>
 <html lang="fr">

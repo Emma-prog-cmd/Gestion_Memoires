@@ -46,7 +46,7 @@ class AuthService
             'prenom'       => trim($d['prenom']),
             'email'        => strtolower(trim($d['email'])),
             'mot_de_passe' => password_hash($d['mot_de_passe'], PASSWORD_BCRYPT, ['cost'=>12]),
-            'role'         => ROLE_ETUDIANT,
+            'role'         => ROLE_ETUDIANT_DIPLOME,
             'id_filiere'   => (int)$d['id_filiere'],
             'actif'        => 1,
         ]);
@@ -128,7 +128,7 @@ class AuthService
     /* ── PRIVÉS ─────────────────────────────────────────── */
     private function creerSession(Utilisateur $u): void {
         session_regenerate_id(true);
-        $_SESSION['user_id']    = $u->id_user;
+        $_SESSION['user_id']    = $u->id_utilisateur;
         $_SESSION['user_nom']   = $u->getNomComplet();
         $_SESSION['user_role']  = $u->role;
         $_SESSION['user_email'] = $u->email;

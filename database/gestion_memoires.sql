@@ -241,3 +241,17 @@ INSERT INTO anciens_memoires (theme, auteur, filiere, promotion, annee_academiqu
     'UML PROJET (1).pdf',
     7
 );
+
+-- ============================================================
+-- Module Auth (Gaïus_Ahs) : colonnes complémentaires
+-- ============================================================
+ALTER TABLE utilisateur
+    ADD COLUMN IF NOT EXISTS actif              TINYINT(1)   NOT NULL DEFAULT 1,
+    ADD COLUMN IF NOT EXISTS id_filiere        INT          NULL,
+    ADD COLUMN IF NOT EXISTS derniere_connexion TIMESTAMP   NULL;
+
+-- Compte admin bcrypt (mot de passe : Admin1234)
+INSERT IGNORE INTO utilisateur (nom, prenom, email, mot_de_passe, role, actif) VALUES
+('GASA', 'Admin', 'admin@uatm.bj',
+ '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'administrateur', 1);

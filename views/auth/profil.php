@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <span class="form-err"><?= htmlspecialchars($erreurs['email']) ?></span>
         <?php endif; ?>
       </div>
-      <?php if ($utilisateur->role === ROLE_ETUDIANT): ?>
+      <?php if ($utilisateur->role === ROLE_ETUDIANT_DIPLOME): ?>
       <div class="form-group">
         <label>Filière</label>
         <select name="id_filiere">
