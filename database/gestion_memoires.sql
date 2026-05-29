@@ -124,3 +124,120 @@ CREATE TABLE gestion_compte (
         REFERENCES utilisateur(id_utilisateur)
         ON DELETE SET NULL
 );
+
+-- ===============================================================
+-- DONNÉES DE TEST
+-- ===============================================================
+
+INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, role) VALUES
+('Admin',     'Systeme',   'admin@gemoires.com',   SHA2('password', 256), 'administrateur'),
+('Kone',      'Aminata',   'aminata@etudiant.com', SHA2('password', 256), 'etudiant_diplome'),
+('Traore',    'Moussa',    'moussa@etudiant.com',  SHA2('password', 256), 'etudiant_diplome'),
+('Coulibaly', 'Fatoumata', 'fatou@etudiant.com',   SHA2('password', 256), 'etudiant_diplome'),
+('Diallo',    'Ibrahim',   'ibrahim@etudiant.com', SHA2('password', 256), 'etudiant_diplome'),
+('Prof',      'Test',      'prof@gemoires.com',    SHA2('password', 256), 'professeur'),
+('Directeur', 'Etudes',    'de@gemoires.com',      SHA2('password', 256), 'directeur_etude');
+
+INSERT INTO memoire (theme, filiere, auteur, promotion, annee_academique, resume, fichier_pdf, statut, id_etudiant) VALUES
+(
+    'Intelligence Artificielle et Diagnostic Medical',
+    'Informatique',
+    'Kone Aminata',
+    'Licence 3',
+    '2023-2024',
+    'Ce memoire explore l application des algorithmes de machine learning pour ameliorer la precision des diagnostics medicaux dans les hopitaux d Afrique de l Ouest.',
+    'UML PROJET (1).pdf',
+    'valide',
+    2
+),
+(
+    'Developpement d une Application Mobile de Gestion Agricole',
+    'Informatique',
+    'Traore Moussa',
+    'Licence 3',
+    '2023-2024',
+    'Etude et conception d une application mobile Android permettant aux agriculteurs de gerer leurs cultures et suivre les previsions meteo.',
+    'UML PROJET (1).pdf',
+    'valide',
+    3
+),
+(
+    'Securite des Systemes d Information dans les PME',
+    'Reseaux et Telecommunications',
+    'Coulibaly Fatoumata',
+    'Licence 3',
+    '2022-2023',
+    'Analyse des vulnerabilites courantes dans les PME et proposition d un framework de securite adapte aux ressources limitees.',
+    'UML PROJET (1).pdf',
+    'valide',
+    4
+),
+(
+    'Blockchain et Tracabilite dans la Chaine d Approvisionnement',
+    'Informatique',
+    'Diallo Ibrahim',
+    'Master 1',
+    '2022-2023',
+    'Implementation d une solution de tracabilite basee sur Ethereum pour securiser la chaine logistique du cacao en Cote d Ivoire.',
+    'UML PROJET (1).pdf',
+    'valide',
+    5
+),
+(
+    'Systeme de Vote Electronique Securise',
+    'Genie Logiciel',
+    'Kone Aminata',
+    'Master 1',
+    '2021-2022',
+    'Conception d un systeme de vote electronique utilisant la cryptographie asymetrique et la technologie blockchain.',
+    'UML PROJET (1).pdf',
+    'valide',
+    2
+);
+
+INSERT INTO anciens_memoires (theme, auteur, filiere, promotion, annee_academique, fichier_pdf, id_directeur) VALUES
+(
+    'Reseaux de Neurones Artificiels Appliques a la Reconnaissance Vocale',
+    'Bamba Seydou',
+    'Informatique',
+    'Licence 3',
+    '2019-2020',
+    'UML PROJET (1).pdf',
+    7
+),
+(
+    'Conception d un Systeme de Gestion Electronique des Documents',
+    'Ouedraogo Marie',
+    'Genie Logiciel',
+    'Licence 3',
+    '2019-2020',
+    'UML PROJET (1).pdf',
+    7
+),
+(
+    'Analyse des Performances des Protocoles de Routage dans les Reseaux Ad Hoc',
+    'Sanogo Paul',
+    'Reseaux et Telecommunications',
+    'Master 1',
+    '2020-2021',
+    'UML PROJET (1).pdf',
+    7
+),
+(
+    'Developpement d un ERP Open Source pour les Cooperatives Agricoles',
+    'Toure Aissatou',
+    'Informatique',
+    'Master 1',
+    '2020-2021',
+    'UML PROJET (1).pdf',
+    7
+),
+(
+    'Impact des Technologies Mobiles sur l Education en Milieu Rural',
+    'Diabate Cheick',
+    'Informatique',
+    'Licence 3',
+    '2018-2019',
+    'UML PROJET (1).pdf',
+    7
+);
